@@ -5,7 +5,7 @@ import Spinner from '@/app/components/Spinner';
 import { issueSchema } from '@/app/validationSchemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Issue } from '@prisma/client';
-import { Button, Callout, TextField } from '@radix-ui/themes';
+import { Button, Callout, Flex, Select, TextField } from '@radix-ui/themes';
 import axios from 'axios';
 import 'easymde/dist/easymde.min.css';
 import { useRouter } from 'next/navigation';
@@ -43,34 +43,49 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
   });
 
   return (
-    <div className="max-w-xl">
+    <div className='max-w-xl'>
       {error && (
-        <Callout.Root color="red" className="mb-5">
+        <Callout.Root color='red' className='mb-5'>
           <Callout.Text>{error}</Callout.Text>
         </Callout.Root>
       )}
-      <form className="space-y-3" onSubmit={onSubmit}>
+      <form className='space-y-3' onSubmit={onSubmit}>
         <TextField.Root>
           <TextField.Input
             defaultValue={issue?.title}
-            placeholder="Title"
+            placeholder='Title'
             {...register('title')}
           />
         </TextField.Root>
         <ErrorMessage>{errors.title?.message}</ErrorMessage>
         <Controller
-          name="description"
+          name='description'
           control={control}
           defaultValue={issue?.description}
           render={({ field }) => (
-            <SimpleMDE placeholder="Description" {...field} />
+            <SimpleMDE placeholder='Description' {...field} />
           )}
         />
-        <ErrorMessage>{errors.description?.message}</ErrorMessage>
-        <Button disabled={isSubmitting}>
-          {issue ? 'Update Issue' : 'Submit New Issue'}{' '}
-          {isSubmitting && <Spinner />}
-        </Button>
+        <Flex gap='5'>
+          <Controller
+            name='status'
+            control={control}
+            defaultValue={issue?.status}
+            render={({ field }) => (
+              <select {...field}>
+                <option value='OPEN'>Open</option>
+                <option value='IN_PROGRESS'>In Progress</option>
+                <option value='CLOSED'>Closed</option>
+              </select>
+            )}
+          />
+
+          <ErrorMessage>{errors.description?.message}</ErrorMessage>
+          <Button disabled={isSubmitting}>
+            {issue ? 'Update Issue' : 'Submit New Issue'}{' '}
+            {isSubmitting && <Spinner />}
+          </Button>
+        </Flex>
       </form>
     </div>
   );
